@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Profile menu – Makeitspicy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0206;
+  --menu: #150610;
+  --field: #1e0b16;
+  --text: #fdf4f8;
+  --text-2: #e7c6d5;
+  --muted: #b98ea3;
+  --faint: #8a6274;
+  --line: rgba(255, 140, 190, .12);
+  --line-2: rgba(255, 140, 190, .22);
+  --pink: #fc2c86;
+  --pink-soft: #ffa7cf;
+  --magenta: #c01d78;
+  --gold: #fcc11e;
+  --gold-text: #ffd351;
+  --teal: #33d6da;
+  --pink-grad: linear-gradient(92deg, #ff5fa2 0%, #fc2c86 48%, #d81e77 100%);
+  color-scheme: dark;
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+/* Makeitspicy is dark-only by design; both theme hooks resolve to the same palette. */
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg: #0a0206; --menu: #150610; --text: #fdf4f8; } }
+:root[data-theme="dark"] { --bg: #0a0206; --menu: #150610; --text: #fdf4f8; }
+
+*, *::before, *::after { box-sizing: inherit; }
+html { height: 100%; scroll-padding-top: env(safe-area-inset-top, 0px); background-color: var(--bg); -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0; min-height: 100%;
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  color: var(--text);
+  background:
+    radial-gradient(50rem 30rem at 88% -6%, rgba(180, 20, 90, .4), transparent 60%),
+    radial-gradient(46rem 34rem at 8% 100%, rgba(200, 30, 120, .26), transparent 60%),
+    var(--bg);
+  background-repeat: no-repeat;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+a { color: inherit; text-decoration: none; }
+svg { display: block; flex: none; }
+:focus-visible { outline: 2px solid var(--pink-soft); outline-offset: 3px; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* ---------- Top bar (context) ---------- */
+.topbar { display: flex; align-items: center; gap: 1rem; width: min(1100px, 100% - 3rem); margin: 0 auto; padding: 1.25rem 0; }
+.brand { display: inline-flex; align-items: center; gap: .7rem; font-weight: 800; font-size: 1.2rem; letter-spacing: -.02em; }
+.brand .logo { width: 2.3rem; height: 2.3rem; border-radius: .7rem; display: grid; place-items: center; background: var(--pink-grad); box-shadow: 0 0 1rem rgba(252, 44, 134, .5), inset 0 1px 0 rgba(255, 255, 255, .4); }
+.brand .logo svg { width: 55%; height: 55%; }
+.brand span { background: linear-gradient(90deg, #fff, #ffb8d6); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.top-coins { margin-left: auto; display: inline-flex; align-items: center; gap: .5rem; height: 2.5rem; padding: 0 1rem 0 .7rem; border-radius: 999px; font-weight: 700; color: var(--gold-text); background: rgba(30, 8, 18, .8); border: 1px solid rgba(232, 181, 58, .5); }
+.avatar-btn { width: 2.75rem; height: 2.75rem; border-radius: 50%; display: grid; place-items: center; font-weight: 800; color: #fff; background: var(--pink-grad); border: 2px solid rgba(255, 180, 214, .6); box-shadow: 0 0 1rem rgba(252, 44, 134, .5); transition: transform .15s ease, box-shadow .2s ease; }
+.avatar-btn:hover { transform: translateY(-1px); box-shadow: 0 0 1.4rem rgba(252, 44, 134, .7); }
+
+/* ---------- Dropdown ---------- */
+.menu-anchor { position: relative; width: min(1100px, 100% - 3rem); margin: 0 auto; }
+.menu {
+  position: absolute; top: .5rem; right: 0; z-index: 30;
+  width: 21.5rem; max-width: calc(100vw - 2rem);
+  border-radius: 1.5rem; overflow: hidden;
+  background: linear-gradient(180deg, #1c0812, var(--menu) 60%, #10040b);
+  border: 1.5px solid rgba(255, 90, 160, .32);
+  box-shadow: 0 2rem 5rem rgba(0, 0, 0, .6), 0 0 3.5rem rgba(220, 30, 120, .22), inset 0 1px 0 rgba(255, 255, 255, .05);
+  transform-origin: top right;
+  transition: opacity .22s ease, transform .22s cubic-bezier(.2, .9, .3, 1);
+}
+.menu[hidden] { display: none; }
+.menu.closing, .menu.opening { opacity: 0; transform: scale(.96) translateY(-.5rem); }
+
+.menu-scroll { max-height: min(80vh, 44rem); overflow-y: auto; scrollbar-width: thin; scrollbar-color: rgba(255,120,180,.4) transparent; }
+.menu-scroll::-webkit-scrollbar { width: 8px; }
+.menu-scroll::-webkit-scrollbar-thumb { background: rgba(255,120,180,.35); border-radius: 999px; }
+
+/* Subscription header */
+.sub-head {
+  position: relative; overflow: hidden;
+  display: flex; align-items: center; gap: .75rem; padding: 1.15rem 1.25rem;
+  background: radial-gradient(120% 100% at 100% 0%, rgba(252, 44, 134, .28), transparent 60%);
+}
+.sub-head .gem { width: 2.5rem; height: 2.5rem; border-radius: .7rem; display: grid; place-items: center; background: rgba(252, 44, 134, .16); border: 1px solid rgba(255, 90, 160, .5); }
+.sub-head .gem svg { width: 1.3rem; height: 1.3rem; color: var(--pink-soft); }
+.sub-head b { display: block; font-size: 1.0625rem; font-weight: 800; letter-spacing: -.01em; }
+.sub-head small { display: block; font-size: .8125rem; color: var(--text-2); margin-top: .05rem; }
+.sub-head .go { margin-left: auto; width: 2rem; height: 2rem; border-radius: 50%; display: grid; place-items: center; background: rgba(255, 255, 255, .06); border: 1px solid var(--line-2); }
+.sub-head .go svg { width: 1rem; height: 1rem; }
+
+/* Coin balance strip */
+.balance { margin: 0 1rem; padding: .9rem 1rem; display: flex; align-items: center; gap: .8rem; border-radius: 1rem; background: linear-gradient(180deg, rgba(40, 30, 10, .5), rgba(28, 20, 8, .5)); border: 1px solid rgba(232, 181, 58, .4); }
+.coin { width: 2rem; height: 2rem; border-radius: 50%; flex: none; background: radial-gradient(circle at 36% 30%, #fff3a6 0 10%, #ffd83f 34%, #f7ad10 72%, #dc8d00 100%); box-shadow: inset 0 -2px 3px rgba(150, 80, 0, .45), 0 0 .6rem rgba(252, 193, 30, .5); }
+.balance .amt { font-size: 1.25rem; font-weight: 800; color: var(--gold-text); font-variant-numeric: tabular-nums; line-height: 1; }
+.balance .lbl { font-size: .75rem; color: var(--muted); }
+.balance .buy { margin-left: auto; height: 2.25rem; padding: 0 1rem; border-radius: 999px; font-size: .875rem; font-weight: 700; color: #1a0b3a; background: linear-gradient(145deg, #ffe07a, #f5b212); box-shadow: 0 0 .9rem rgba(252, 193, 30, .35); transition: filter .2s ease, transform .15s ease; }
+.balance .buy:hover { filter: brightness(1.05); } .balance .buy:active { transform: scale(.97); }
+
+/* Nav groups */
+.group { padding: .5rem .6rem; }
+.group + .group { border-top: 1px solid var(--line); }
+.group-label { padding: .7rem .65rem .35rem; font-size: .7rem; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--faint); }
+.item { position: relative; width: 100%; display: flex; align-items: center; gap: .85rem; padding: .8rem .65rem; border-radius: .85rem; text-align: left; transition: background-color .18s ease; }
+.item:hover, .item:focus-visible { background: rgba(252, 44, 134, .12); }
+.item .ico { width: 2.25rem; height: 2.25rem; border-radius: .65rem; flex: none; display: grid; place-items: center; background: var(--field); border: 1px solid var(--line-2); transition: border-color .18s ease, background-color .18s ease; }
+.item:hover .ico { border-color: rgba(255, 120, 180, .5); background: rgba(252, 44, 134, .14); }
+.item .ico svg { width: 1.2rem; height: 1.2rem; color: var(--pink-soft); }
+.item .txt { flex: 1; min-width: 0; }
+.item .txt b { display: block; font-size: 1rem; font-weight: 600; color: var(--text); }
+.item .txt small { display: block; font-size: .78rem; color: var(--muted); margin-top: .05rem; }
+.item .chev { width: 1.1rem; height: 1.1rem; color: var(--faint); transition: transform .18s ease, color .18s ease; }
+.item:hover .chev { transform: translateX(3px); color: var(--pink-soft); }
+.item .badge { height: 1.5rem; padding: 0 .6rem; display: inline-flex; align-items: center; gap: .3rem; border-radius: 999px; font-size: .7rem; font-weight: 700; }
+.badge--new { color: #fff; background: var(--pink-grad); box-shadow: 0 0 .7rem rgba(252, 44, 134, .5); }
+.badge--reward { color: var(--gold-text); background: rgba(252, 193, 30, .14); border: 1px solid rgba(232, 181, 58, .5); }
+.item .crown { width: 1.4rem; height: 1.4rem; color: var(--gold); }
+
+/* Ad card */
+.ad { position: relative; overflow: hidden; margin: .6rem 1rem 1rem; padding: 1.35rem 1.25rem 1.25rem; border-radius: 1.25rem; text-align: center; border: 1px solid rgba(255, 90, 160, .4); }
+.ad .veil { position: absolute; inset: 0; z-index: -2; background: radial-gradient(120% 70% at 50% 0%, rgba(252, 44, 134, .4), transparent 60%), linear-gradient(180deg, rgba(48, 10, 30, .9), rgba(18, 5, 12, .95)); }
+.ad .fx { position: absolute; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
+.ad .beam { position: absolute; top: -30%; bottom: -30%; width: 24%; transform: skewX(-16deg); background: linear-gradient(90deg, transparent, rgba(255, 210, 235, .45), transparent); filter: blur(3px); mix-blend-mode: screen; }
+.ad .spark { position: absolute; color: #ff9ec8; }
+.ad-badge { position: absolute; top: .8rem; right: .8rem; height: 1.4rem; padding: 0 .5rem; display: inline-flex; align-items: center; border-radius: .4rem; font-size: .6rem; font-weight: 800; letter-spacing: .12em; color: var(--muted); background: rgba(10, 4, 8, .6); border: 1px solid var(--line-2); }
+.ad .logo { width: 3rem; height: 3rem; margin: .25rem auto 0; border-radius: .85rem; display: grid; place-items: center; background: var(--pink-grad); box-shadow: 0 0 1.4rem rgba(252, 44, 134, .55), inset 0 1px 0 rgba(255, 255, 255, .4); }
+.ad .logo svg { width: 55%; height: 55%; }
+.ad h3 { margin: .9rem 0 0; font-size: 1.2rem; font-weight: 800; letter-spacing: -.02em; }
+.ad h3 em { font-style: normal; background: var(--pink-grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.ad p { margin: .5rem 0 0; font-size: .8125rem; line-height: 1.5; color: var(--text-2); }
+.ad .points { display: grid; gap: .5rem; margin: 1rem auto 0; text-align: left; width: max-content; }
+.ad .points span { display: inline-flex; align-items: center; gap: .55rem; font-size: .8125rem; color: var(--text-2); }
+.ad .points i { width: 1.3rem; height: 1.3rem; border-radius: 50%; flex: none; display: grid; place-items: center; background: rgba(252, 44, 134, .2); border: 1px solid rgba(255, 90, 160, .5); }
+.ad .points i svg { width: .78rem; height: .78rem; }
+.ad .cta { position: relative; overflow: hidden; margin-top: 1.1rem; width: 100%; height: 2.9rem; border-radius: 999px; font-size: .9375rem; font-weight: 800; color: #fff; background: var(--pink-grad); box-shadow: 0 0 1.5rem rgba(252, 44, 134, .5), inset 0 1px 0 rgba(255, 255, 255, .4); display: inline-flex; align-items: center; justify-content: center; gap: .5rem; transition: filter .2s ease, transform .15s ease; }
+.ad .cta:hover { filter: brightness(1.07); } .ad .cta:active { transform: scale(.98); }
+.ad .cta svg { width: 1.05rem; height: 1.05rem; }
+.ad .cta::after { content: ""; position: absolute; top: 0; bottom: 0; left: -40%; width: 28%; background: linear-gradient(100deg, transparent, rgba(255, 255, 255, .4), transparent); transform: skewX(-18deg); animation: sheen 3.4s ease-in-out 1.2s infinite; }
+@keyframes sheen { 0% { left: -40%; } 45%, 100% { left: 130%; } }
+
+/* Sign out */
+.signout { width: calc(100% - 2rem); margin: 0 1rem 1rem; height: 2.85rem; border-radius: .9rem; display: inline-flex; align-items: center; justify-content: center; gap: .5rem; font-weight: 600; color: var(--text-2); background: rgba(255, 255, 255, .03); border: 1px solid var(--line-2); transition: background-color .18s ease, color .18s ease; }
+.signout:hover { background: rgba(252, 44, 134, .12); color: #fff; }
+.signout svg { width: 1.15rem; height: 1.15rem; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .ad .beam { animation: beam 6s ease-in-out infinite; }
+  .ad .beam.b2 { animation-delay: 2.6s; }
+  @keyframes beam { 0% { left: -20%; opacity: 0; } 15% { opacity: .8; } 55% { left: 120%; opacity: .8; } 70%, 100% { left: 120%; opacity: 0; } }
+  .ad .spark { animation: twinkle 2.6s ease-in-out infinite alternate; }
+  @keyframes twinkle { from { opacity: .5; transform: scale(.85); } to { opacity: 1; transform: scale(1.15); } }
+}
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; } }
+
+@media (max-width: 560px) {
+  .menu { position: fixed; top: auto; bottom: 0; right: 0; left: 0; width: 100%; max-width: 100%; border-radius: 1.5rem 1.5rem 0 0; transform-origin: bottom center; }
+  .menu.closing, .menu.opening { transform: translateY(1rem); }
+  .menu-scroll { max-height: 82vh; }
+}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-flame" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.4-.5-2-1-3-1.1-2.1-.2-4 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.1.4-2.3 1-3a2.5 2.5 0 0 0 2.5 2.5Z"/></symbol>
+    <symbol id="i-chev" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-spark" viewBox="0 0 24 24"><path fill="currentColor" d="M12 1c.9 6.2 4.8 10.1 11 11-6.2.9-10.1 4.8-11 11-.9-6.2-4.8-10.1-11-11 6.2-.9 10.1-4.8 11-11Z"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M4 12h15M13 6l6 6-6 6" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  </defs>
+</svg>
+
+<!-- Context bar so you can open the menu from the avatar -->
+<header class="topbar">
+  <span class="brand"><span class="logo" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#i-flame" stroke="#fff"/></svg></span><span>Makeitspicy</span></span>
+  <span class="top-coins"><span class="coin" aria-hidden="true" style="width:1.35rem;height:1.35rem"></span>935</span>
+  <button class="avatar-btn" id="avatar" type="button" aria-haspopup="menu" aria-expanded="false" aria-controls="profileMenu">RU</button>
+</header>
+
+<div class="menu-anchor">
+  <div class="menu" id="profileMenu" role="menu" aria-label="Profile" hidden>
+    <div class="menu-scroll">
+
+      <!-- Subscription header -->
+      <button class="sub-head" type="button" role="menuitem">
+        <span class="gem" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M6 3h12l4 6-10 12L2 9Z"/><path d="M2 9h20M9 3 7 9l5 12 5-12-2-6"/></svg></span>
+        <span><b>Get Subscription</b><small>Unlock unlimited creations</small></span>
+        <span class="go" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#i-chev"/></svg></span>
+      </button>
+
+      <!-- Coin balance -->
+      <div class="balance">
+        <span class="coin" aria-hidden="true"></span>
+        <span><span class="amt">935</span><span class="lbl">coins available</span></span>
+        <button class="buy" type="button" role="menuitem">Top up</button>
+      </div>
+
+      <!-- Primary nav -->
+      <div class="group">
+        <button class="item" type="button" role="menuitem">
+          <span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="m15 9-2 5-5 2 2-5 5-2Z"/></svg></span>
+          <span class="txt"><b>Explore</b></span>
+          <svg class="chev" viewBox="0 0 24 24"><use href="#i-chev"/></svg>
+        </button>
+        <button class="item" type="button" role="menuitem">
+          <span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="3" y="4" width="14" height="14" rx="2.5"/><path d="M21 8v11a2 2 0 0 1-2 2H8"/><path d="M13 8v6M10 11h6"/></svg></span>
+          <span class="txt"><b>My Collection</b></span>
+          <svg class="chev" viewBox="0 0 24 24"><use href="#i-chev"/></svg>
+        </button>
+      </div>
+
+      <!-- Tools -->
+      <div class="group">
+        <div class="group-label">Our tools</div>
+        <button class="item" type="button" role="menuitem">
+          <span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 4 4 15l5 5L20 9Z"/><path d="m13 6 5 5"/><path d="M19 3v4M17 5h4M6 17v2M5 18h2"/></svg></span>
+          <span class="txt"><b>AI Generator</b><small>Turn a photo into a video</small></span>
+          <span class="badge badge--new">New</span>
+        </button>
+      </div>
+
+      <!-- Earn -->
+      <div class="group">
+        <div class="group-label">Earn with us</div>
+        <button class="item" type="button" role="menuitem">
+          <span class="ico" aria-hidden="true"><svg class="crown" viewBox="0 0 24 24"><path fill="currentColor" d="M3 8l4.5 4L12 5l4.5 7L21 8l-1.6 9.5H4.6L3 8Z"/></svg></span>
+          <span class="txt"><b>Affiliate Program</b><small>Earn 20% from every referral</small></span>
+          <span class="badge badge--reward">+50</span>
+        </button>
+        <button class="item" type="button" role="menuitem">
+          <span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="7" y="2" width="10" height="20" rx="2.5"/><path d="M11 18h2"/></svg></span>
+          <span class="txt"><b>Get the App</b></span>
+          <span class="badge badge--reward">Free</span>
+        </button>
+      </div>
+
+      <!-- Ad card -->
+      <div class="ad" role="group" aria-label="Advertisement">
+        <span class="veil"></span>
+        <span class="fx"><span class="beam" style="left:16%"></span><span class="beam b2" style="left:66%"></span>
+          <svg class="spark" style="left:8%;top:16%;width:1.1rem;height:1.1rem" viewBox="0 0 24 24"><use href="#i-spark"/></svg>
+          <svg class="spark" style="right:10%;bottom:26%;width:.9rem;height:.9rem;animation-delay:-1s" viewBox="0 0 24 24"><use href="#i-spark"/></svg>
+        </span>
+        <span class="ad-badge">AD</span>
+        <span class="logo" aria-hidden="true"><svg viewBox="0 0 24 24"><use href="#i-flame" stroke="#fff"/></svg></span>
+        <h3>Go <em>Pro</em> while you wait</h3>
+        <p>Skip the queue and unlock every premium style.</p>
+        <div class="points">
+          <span><i><svg viewBox="0 0 24 24"><use href="#i-check"/></svg></i>Instant generation</span>
+          <span><i><svg viewBox="0 0 24 24"><use href="#i-check"/></svg></i>Unlimited videos</span>
+          <span><i><svg viewBox="0 0 24 24"><use href="#i-check"/></svg></i>All premium styles</span>
+        </div>
+        <button class="cta" type="button">Try Pro free <svg viewBox="0 0 24 24"><use href="#i-arrow"/></svg></button>
+      </div>
+
+      <!-- Sign out -->
+      <button class="signout" type="button" role="menuitem">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3"/><path d="M10 17 5 12l5-5M5 12h11"/></svg>
+        Sign out
+      </button>
+
+    </div>
+  </div>
+</div>
+
+<script>
+(() => {
+  const avatar = document.getElementById('avatar');
+  const menu = document.getElementById('profileMenu');
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let open = false;
+
+  function openMenu() {
+    if (open) return;
+    open = true;
+    menu.hidden = false;
+    menu.classList.add('opening');
+    requestAnimationFrame(() => requestAnimationFrame(() => menu.classList.remove('opening')));
+    avatar.setAttribute('aria-expanded', 'true');
+    // focus first menu item for keyboard users
+    const first = menu.querySelector('[role="menuitem"]');
+    if (first) first.focus({ preventScroll: true });
+  }
+  function closeMenu(returnFocus) {
+    if (!open) return;
+    open = false;
+    avatar.setAttribute('aria-expanded', 'false');
+    const done = () => { menu.hidden = true; menu.classList.remove('closing'); menu.removeEventListener('transitionend', done); };
+    if (reduceMotion) { done(); } else { menu.classList.add('closing'); menu.addEventListener('transitionend', done); setTimeout(done, 300); }
+    if (returnFocus) avatar.focus();
+  }
+
+  avatar.addEventListener('click', () => (open ? closeMenu(true) : openMenu()));
+  document.addEventListener('click', (e) => { if (open && !menu.contains(e.target) && e.target !== avatar) closeMenu(false); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && open) closeMenu(true); });
+
+  // Arrow-key roving through menu items.
+  menu.addEventListener('keydown', (e) => {
+    if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
+    e.preventDefault();
+    const items = Array.from(menu.querySelectorAll('[role="menuitem"], .cta, .buy'));
+    const i = items.indexOf(document.activeElement);
+    const next = e.key === 'ArrowDown' ? (i + 1) % items.length : (i - 1 + items.length) % items.length;
+    items[next].focus();
+  });
+
+  // Open on load so the design is visible immediately.
+  openMenu();
+})();
+</script>
+</body>
+</html>
